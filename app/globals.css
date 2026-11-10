@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Lenis smooth-scroll recommended styles */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* Honeycomb background pattern */
+.honeycomb-bg {
+  background-color: #fff8e7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23F5B301' stroke-opacity='0.18' stroke-width='2'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%23F5B301' stroke-opacity='0.12' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* Slowly spinning honeycomb decoration */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 30s linear infinite;
+}
+
+/* Pollen floating upward */
+@keyframes pollen {
+  0% { translate: 0 0; opacity: 0; }
+  20% { opacity: 1; }
+  100% { translate: 30px -120px; opacity: 0; }
+}
+.pollen {
+  animation: pollen 5s ease-in-out infinite;
+}
