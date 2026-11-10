@@ -1,9 +1,13 @@
-// Image upload for the admin panel. Files go to /uploads (project root) and are served by app/uploads/[file]/route.js
+// Image upload for the admin panel.
+//   • On Render (PostgreSQL / Neon): stored in the `uploads` table — Render's disk is wiped on every deploy.
+//   • Locally (MySQL): saved as files in /uploads (project root).
+// Both are served by app/uploads/[file]/route.js at /uploads/<name>.
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import { isAdmin } from "@/lib/auth";
+import { getDb } from "@/lib/db";
 
 const TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -18,8 +22,15 @@ export async function POST(req) {
   if (file.size > MAX_BYTES) return NextResponse.json({ error: "Image must be under 5 MB" }, { status: 400 });
 
   const name = `${crypto.randomBytes(8).toString("hex")}.${ext}`;
-  const dir = path.join(process.cwd(), "uploads");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, name), Buffer.from(await file.arrayBuffer()));
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const db = await getDb();
+  if (db.saveUpload) {
+    await db.saveUpload(name, file.type, buffer);
+  } else {
+    const dir = path.join(process.cwd(), "uploads");
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(path.join(dir, name), buffer);
+  }
   return NextResponse.json({ url: `/uploads/${name}` });
 }
